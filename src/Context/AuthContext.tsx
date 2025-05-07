@@ -20,39 +20,45 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const navigate = useNavigate();
     
     useEffect(() => {
-        const storedToken = localStorage.getItem('token');
-        const storedUser = localStorage.getItem('user');
-        console.log('Stored token:', storedToken);
-        console.log('Stored user:', storedUser);
+        const fetchAuthStatus = async () => {
+            const storedToken = localStorage.getItem('token');
+            const storedUser = localStorage.getItem('user');
+            console.log('Stored token:', storedToken);
+            console.log('Stored user:', storedUser);
 
-        if(storedToken && storedUser) {
-            fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/status`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${storedToken}`,
-                },
-            }).then(res => {
-                if (!res.ok) {
-                  throw new Error('Invalid token');
+            if (storedToken && storedUser) {
+                try {
+                    const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/status`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${storedToken}`,
+                        },
+                    });
+
+                    if (!res.ok) {
+                        console.error('Failed to fetch auth status:', res);
+                        throw new Error('Invalid token');
+                    }
+
+                    localStorage.setItem('token', storedToken);
+                    localStorage.setItem('user', storedUser);
+
+                    setUser(JSON.parse(storedUser));
+                    setToken(storedToken);
+                } catch (error) {
+                    console.error('Invalid token or user data:', error);
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    setUser(null);
+                    setToken(null);
+                    navigate('/login');
                 }
-                localStorage.setItem('token', storedToken);
-                localStorage.setItem('user', storedUser);
-                return res.json();
-              })
-              .catch(error => {
-                console.error('Invalid token or user data:', error);
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-                setUser(null);
-                setToken(null);
-                navigate('/login');
-              });
+            }
+        };
 
-            setUser(JSON.parse(storedUser));
-            setToken(storedToken);
-        }
-     }, [])
+        fetchAuthStatus();
+    }, []);
 
     const login = (user: User, token: string) => {
         if (!user || !token) {
