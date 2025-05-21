@@ -9,46 +9,55 @@ export default function RegisterPage() {
 
     const [username, setLogin] = useState('');
     const [password, setPassword] = useState('');
+    const [repeatPassword, setRepeatPassword] = useState('');
     const [loading, setLoading] = useState(false);
 
     const { login: authLogin } = useAuth(); 
+    const { user: authUser, token: authToken} = useAuth();
     const navigate = useNavigate();
+
+    if (authUser || authToken) {
+      console.log('User is already logged in:', authLogin);
+      navigate('/');
+    }
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
+        if (password !== repeatPassword) {
+            alert('Passwords do not match!');
+            return;
+        }
         console.log('Login:', username, 'Password:', password);
 
     
 
-    setLoading(true);
+      setLoading(true);
 
-    try {
-        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, password }),
-        });
+      try {
+          const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/register`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ username, password }),
+          });
 
-        const data = await res.json();
-        if (res.ok) {
-            console.log('Register successful:', data);
-            authLogin({ login: username }, data.access_token);
-            navigate('/');
-        } else {
-            alert('Register failed: ' + data.message); 
-            navigate('/register');
-        } 
-    } catch (error) {
-        console.error('Error during register:', error);
-        alert('Register failed: Unable to reach the server. Please try again later.');
-    } finally {
-        setLoading(false);
-    }
-    
-
-}
+          const data = await res.json();
+          if (res.ok) {
+              console.log('Register successful:', data);
+              authLogin({ login: username }, data.access_token);
+              navigate('/');
+          } else {
+              alert('Register failed: ' + data.message); 
+              navigate('/register');
+          } 
+      } catch (error) {
+          console.error('Error during register:', error);
+          alert('Register failed: Unable to reach the server. Please try again later.');
+      } finally {
+          setLoading(false);
+      }
+  }
 
     return (
         <>
@@ -92,6 +101,15 @@ export default function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+              <TextField
+                label="Repeat Password"
+                type="password"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={repeatPassword}
+                onChange={(e) => setRepeatPassword(e.target.value)}
+              />
               <Button
                 type="submit"
                 variant="contained"
@@ -106,6 +124,9 @@ export default function RegisterPage() {
                     'Register'
                   )}
               </Button>
+              <Typography variant="body2" align="center" sx={{ marginTop: 2 }}>
+                Already have an account? <a href='' onClick={() => {navigate('/')}}>Login</a>
+              </Typography>
             </form>
           </Box>
         </Box> </>

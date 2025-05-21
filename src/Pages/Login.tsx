@@ -7,10 +7,16 @@ import { useAuth } from '../Context/AuthContext';
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login: authLogin } = useAuth(); 
+  const { user: authUser, token: authToken} = useAuth();
 
   const [username, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  if (authUser || authToken) {
+    console.log('User is already logged in:', authLogin);
+    navigate('/');
+  }
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
