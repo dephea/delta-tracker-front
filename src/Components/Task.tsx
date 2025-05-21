@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../Context/AuthContext";
+import { ImgComparisonSlider } from '@img-comparison-slider/react';
 
 type Task = {
     id: number;
@@ -15,6 +16,7 @@ type Task = {
 
 export default function TaskItem({taskId}: {taskId: number}) {
     const [task, setTask] = useState<Task | null>(null);
+    const [sliderValue, setSliderValue] = useState(1);
     const [loading, setLoading] = useState(true);
     const { token } = useAuth();
 
@@ -50,12 +52,103 @@ export default function TaskItem({taskId}: {taskId: number}) {
     if (loading) return <div>Loading...</div>;
     if (!task) return <div>Task not found</div>;
     
-    return (
-        <div>
-          <h3>{task.title}</h3>
-          <p>{task.description ?? "No description"}</p>
-          <p>Status: {task.isCompleted ? "Completed" : "Pending"}</p>
-          <p>Due: {task.dueDate ?? "No due date"}</p>
+    const currentTask = (
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+            padding: '16px',
+            boxSizing: 'border-box',
+            fontFamily: 'Segoe UI, sans-serif',
+            fontSize: '0.9rem',
+            lineHeight: '1.4',
+            color: '#222',
+            backgroundColor: '#fff',
+          }}
+        >
+          <h3 style={{ margin: '0 0 8px 0', fontSize: '1.2rem' }}>{task.title}</h3>
+      
+          {task.description && (
+            <p style={{ margin: '0 0 12px 0', color: '#555' }}>{task.description}</p>
+          )}
+      
+          <p style={{ margin: '0 0 6px 0' }}>
+            <strong>Status:</strong>{' '}
+            <span style={{ color: task.isCompleted ? 'green' : '#d35400' }}>
+              {task.isCompleted ? 'Completed' : 'Pending'}
+            </span>
+          </p>
+      
+          {task.dueDate && (
+            <p style={{ margin: '0 0 6px 0' }}>
+              <strong>Due:</strong> {new Date(task.dueDate).toLocaleString()}
+            </p>
+          )}
+      
+          {task.createdAt && (
+            <p style={{ margin: '0 0 6px 0', fontSize: '0.8rem', color: '#777' }}>
+              <strong>Created:</strong> {new Date(task.createdAt).toLocaleString()}
+            </p>
+          )}
+      
+          {task.updatedAt && (
+            <p style={{ margin: '0', fontSize: '0.8rem', color: '#777' }}>
+              <strong>Updated:</strong> {new Date(task.updatedAt).toLocaleString()}
+            </p>
+          )}
         </div>
       );
+      
+
+
+    return (
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            width: '300px', // Задаем ширину контейнера
+            height: '200px', // Задаем высоту контейнера
+            margin: '10px', // Отступ между задачами
+            border: '2px solid #ccc', // Граница контейнера
+        }}>
+        <ImgComparisonSlider
+          value={sliderValue}
+          onChange={(event) => setSliderValue(Number((event.target as HTMLInputElement).value))}
+          style={{
+            width: '300px',
+            height: '200px',
+            '--divider-width': '4px',
+            '--divider-color': '#333',
+            '--default-handle-opacity': '0.5',
+          } as React.CSSProperties}
+        >
+          <div
+    slot="first"
+    style={{
+      backgroundColor: 'rgba(0, 128, 0, 0.4)', // прозрачный зелёный
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      fontSize: '1.2rem',
+      fontWeight: 'bold',
+      color: '#fff',
+      textShadow: '0 0 4px rgba(0,0,0,0.5)',
+      boxSizing: 'border-box',
+    }}
+  >
+    Completed
+  </div>
+          <div slot="second" style={{}}>
+            {/* RIGHT SIDE */}
+            {currentTask}
+          </div>
+        </ImgComparisonSlider>
+        </div>
+      );         
 }

@@ -52,7 +52,13 @@ const HomePage = () => {
         <>
         <Header />
         
-        <div>
+        <div style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            marginTop: "20px",
+            marginLeft: "20px",
+        }}>
             {tasks.map((taskId) => (
                 <TaskItem taskId={Number(taskId)} />
             ))}
