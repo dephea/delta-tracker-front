@@ -16,7 +16,7 @@ type Task = {
 
 export default function TaskItem({taskId}: {taskId: number}) {
     const [task, setTask] = useState<Task | null>(null);
-    const [sliderValue, setSliderValue] = useState(1);
+    const [sliderValue, setSliderValue] = useState(4);
     const [loading, setLoading] = useState(true);
     const { token } = useAuth();
 
@@ -30,7 +30,7 @@ export default function TaskItem({taskId}: {taskId: number}) {
                         'Authorization': `Bearer ${token}`,
                     },
                 });
-                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                if (!res.ok) throw new Error(`HTTP error status: ${res.status}`);
 
                 const data = await res.json();
                 setTask(data);
@@ -94,12 +94,6 @@ export default function TaskItem({taskId}: {taskId: number}) {
               <strong>Created:</strong> {new Date(task.createdAt).toLocaleString()}
             </p>
           )}
-      
-          {task.updatedAt && (
-            <p style={{ margin: '0', fontSize: '0.8rem', color: '#777' }}>
-              <strong>Updated:</strong> {new Date(task.updatedAt).toLocaleString()}
-            </p>
-          )}
         </div>
       );
       
@@ -110,10 +104,10 @@ export default function TaskItem({taskId}: {taskId: number}) {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            width: '300px', // Задаем ширину контейнера
-            height: '200px', // Задаем высоту контейнера
-            margin: '10px', // Отступ между задачами
-            border: '2px solid #ccc', // Граница контейнера
+            width: '300px',
+            height: '200px',
+            margin: '10px',
+            border: '2px solid #ccc',
         }}>
         <ImgComparisonSlider
           value={sliderValue}
@@ -126,24 +120,25 @@ export default function TaskItem({taskId}: {taskId: number}) {
             '--default-handle-opacity': '0.5',
           } as React.CSSProperties}
         >
+          {/* LEFT SIDE */}
           <div
-    slot="first"
-    style={{
-      backgroundColor: 'rgba(0, 128, 0, 0.4)', // прозрачный зелёный
-      width: '100%',
-      height: '100%',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      fontSize: '1.2rem',
-      fontWeight: 'bold',
-      color: '#fff',
-      textShadow: '0 0 4px rgba(0,0,0,0.5)',
-      boxSizing: 'border-box',
-    }}
-  >
-    Completed
-  </div>
+            slot="first"
+            style={{
+              backgroundColor: 'rgba(0, 128, 0, 0.4)',
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              fontSize: '1.2rem',
+              fontWeight: 'bold',
+              color: '#fff',
+              textShadow: '0 0 4px rgba(0,0,0,0.5)',
+              boxSizing: 'border-box',
+            }}
+          >
+            Completed
+          </div>
           <div slot="second" style={{}}>
             {/* RIGHT SIDE */}
             {currentTask}

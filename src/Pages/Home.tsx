@@ -30,9 +30,9 @@ const HomePage = () => {
                     },
                 });
                 if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-                const data: Task[] = await res.json(); // Explicitly type the response as Task[]
+                const data: Task[] = await res.json();
 
-                const idsArray = data.map((task: Task) => task.id); // Type of 'task' is now inferred
+                const idsArray = data.map((task: Task) => task.id);
                 setTasks(idsArray);
 
 
@@ -52,6 +52,9 @@ const HomePage = () => {
         <>
         <Header />
         
+        <h1>Welcome to the home page</h1>
+        <h2>Here are your tasks:</h2>
+        
         <div style={{
             display: "flex",
             flexDirection: "row",
@@ -59,6 +62,7 @@ const HomePage = () => {
             marginTop: "20px",
             marginLeft: "20px",
         }}>
+
             {tasks.map((taskId) => (
                 <TaskItem taskId={Number(taskId)} />
             ))}

@@ -1,102 +1,68 @@
-import { AppBar, Box, Button, Container, IconButton, Menu, MenuItem, Toolbar, Typography } from "@mui/material";
-import React from "react";
-import AdbIcon from '@mui/icons-material/Adb';
-import MenuIcon from '@mui/icons-material/Menu';
+import { AppBar, Box, Button, Container, Toolbar} from "@mui/material";
+import { useState } from "react";
 import AccountMenu from "./AccountMenu";
 import { useNavigate } from "react-router-dom";
+import CreateTask from "./createTask";
 
 
-const pages = ['Authentication'];
 
 
 function ResponsiveAppBar() {
   const navigate = useNavigate();
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
-
-  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNav(event.currentTarget);
-  };
-
-  const handleCloseNavMenu = () => {
-    navigate('/register');
-    setAnchorElNav(null);
-  };
-
+  const [showModal, setShowModal] = useState(false);
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" sx={{ backgroundColor: 'rgba(0, 128, 0, 0.4)' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           
-          
-
-          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-              sx={{ display: { xs: 'block', md: 'none' } }}
-            >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-          <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
-            sx={{
-              mr: 2,
-              display: { xs: 'flex', md: 'none' },
-              flexGrow: 1,
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            LOGO
-          </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
-              >
-                {page}
-              </Button>
-            ))}
+            <Button
+              key="register"
+              onClick={() => navigate('/register')}
+              sx={{ my: 2, color: 'white', display: 'block', border: '1px solid white', margin: '2px', borderRadius: '10px' }}
+            >
+              Register
+            </Button>
+            <Button
+              key="create task"
+              onClick={() => setShowModal(true)}
+              sx={{ my: 2, color: 'white', display: 'block', border: '1px solid white', margin: '2px', borderRadius: '10px'   }}
+            >
+              create task
+            </Button>
           </Box>
           <AccountMenu />
         </Toolbar>
       </Container>
+      {showModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+          onClick={() => setShowModal(false)}
+        >
+          <div
+            style={{
+              backgroundColor: "#fff",
+              color: "#000",
+              padding: "20px",
+              borderRadius: "8px",
+              width: "400px",
+              boxShadow: "0 0 10px rgba(0,0,0,0.3)",
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <CreateTask />
+          </div>
+        </div>
+      )}
     </AppBar>
   );
 }
