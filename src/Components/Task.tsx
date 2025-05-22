@@ -16,11 +16,40 @@ type Task = {
 
 export default function TaskItem({taskId}: {taskId: number}) {
     const [task, setTask] = useState<Task | null>(null);
-    const [sliderValue, setSliderValue] = useState(4);
+    const [sliderValue, setSliderValue] = useState(6);
+    const [isDragging, setIsDragging] = useState(false);
     const [loading, setLoading] = useState(true);
     const { token } = useAuth();
 
+  const updateTaskCompletion = async (completed: boolean) => {
+    console.log('Updating task completion:', completed);
+        try {
+          const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/tasks/update`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              id: taskId,
+              isCompleted: completed,
+            }),
+          });
+          if (!res.ok) throw new Error(`HTTP error status: ${res.status}`);
+          const data = await res.json();
+          setTask(data);
+          setSliderValue(completed ? 100 : 0);
+        } catch (error) {
+          console.error('Failed to update task:', error);
+          alert('Failed to update task: ' + error);
+        }
+      };
+
+
+
+    // fetching the task
     useEffect(() => {
+      console.log('Fetching task with ID:', taskId);
         const fetchTask = async () => {
             try {
                 const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/tasks/find/${taskId}`, {
@@ -47,6 +76,24 @@ export default function TaskItem({taskId}: {taskId: number}) {
         }
 
     }, [taskId, token]);
+
+    useEffect(() => {
+      if (task) {
+        setSliderValue(task.isCompleted ? 100 : 0);
+      }
+    }, [task]);
+
+
+    // handle the slider value
+    useEffect(() => {
+        //if (isDragging) return;
+        if (sliderValue >=95 && !task?.isCompleted) {
+            updateTaskCompletion(true);
+        } else if (sliderValue <= 5 && task?.isCompleted) {
+            updateTaskCompletion(false);
+        }
+        
+      }, [sliderValue, isDragging, task?.isCompleted]);
 
 
     if (loading) return <div>Loading...</div>;
@@ -108,10 +155,13 @@ export default function TaskItem({taskId}: {taskId: number}) {
             height: '200px',
             margin: '10px',
             border: '2px solid #ccc',
-        }}>
+        }} 
+        >
         <ImgComparisonSlider
           value={sliderValue}
-          onChange={(event) => setSliderValue(Number((event.target as HTMLInputElement).value))}
+          onSlide={(event => {
+            setSliderValue(event.target.value);
+          })}
           style={{
             width: '300px',
             height: '200px',
@@ -119,6 +169,8 @@ export default function TaskItem({taskId}: {taskId: number}) {
             '--divider-color': '#333',
             '--default-handle-opacity': '0.5',
           } as React.CSSProperties}
+          onMouseDown={() => setIsDragging(true)}
+          onMouseUp={() => setIsDragging(false)}
         >
           {/* LEFT SIDE */}
           <div
